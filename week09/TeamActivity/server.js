@@ -1,13 +1,14 @@
 var port = process.env.PORT || 8080;
 var express = require('express');
+var path = require('path');
 var app = express();
 
-app.use(express.static('public'));
+app.use(express.static(__dirname+'/public'));
 app.set('views', 'views');
 app.set('view engine', 'ejs');
 
 app.get("/", function(req, res) {
-	res.sendFile('./public/home.html');
+	res.sendFile(path.join(__dirname+'/public/home.html'));
 })
 
 app.get("/math", function(req, res) {
