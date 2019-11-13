@@ -7,7 +7,7 @@ app.set('views', 'views');
 app.set('view engine', 'ejs');
 
 app.get("/", function(req, res) {
-	res.sendFile('public/home.html');
+	res.sendFile('./public/home.html');
 })
 
 app.get("/math", function(req, res) {
