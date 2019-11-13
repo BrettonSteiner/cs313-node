@@ -1,4 +1,4 @@
-var http = require('http');
+var port = process.env.PORT || 8080;
 var express = require('express');
 var app = express();
 
@@ -8,7 +8,7 @@ app.set('view engine', 'ejs');
 
 app.get("/math", function(req, res) {
 	// Controller
-    console.log("Received a request for the home page");
+    console.log("Received a request for the math page");
     var operator = req.query.operator;
     // console.log(operator);
     var operand1 = req.query.operand1;
@@ -17,18 +17,12 @@ app.get("/math", function(req, res) {
     var result = calculate(operator, operand1, operand2);
     var object = {result:result};
 
-	// var name = getCurrentLoggedInUserAccount();
-	// var emailAddress = "john@email.com";
-
-	// var params = {username: name, email: emailAddress};
-    // res.write("This is the root.");
-	// res.end();
     res.render("math", object);
     console.log(object);
 });
 
-app.listen(8080, function() {
-	console.log("The server is up and listening on port 5000");
+app.listen(port, function() {
+	console.log("The server is up and listening on port " + port);
 });
 
 
