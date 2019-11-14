@@ -1,11 +1,11 @@
 {
   "name": "team",
   "version": "1.0.0",
-  "description": "",
+  "description": "In-class Rock, Paper, Scissors Game",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./week09/TeamActivity/server.js"
+    "start": "node ./week09/Prove/server.js"
   },
   "author": "",
   "license": "ISC",
