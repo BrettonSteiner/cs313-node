@@ -1,0 +1,15 @@
+body {
+    text-align: center;
+}
+
+h1 {
+    color: blue;
+}
+
+form {
+    width: 60%;
+    margin: auto;
+    border: solid black;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
