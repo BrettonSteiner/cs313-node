@@ -5,3 +5,4 @@
 /week09/TeamActivity/node_modules
 /.vs
 /node_modules
+variables.env
