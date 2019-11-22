@@ -1,11 +1,11 @@
 {
   "name": "cs313-node",
   "version": "1.0.0",
-  "description": "Postal Rate Calculator",
+  "description": "Milestone 1",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./week09/Prove/server.js"
+    "start": "node ./week10/Prove/server.js"
   },
   "author": "Bretton Steiner",
   "license": "ISC",
