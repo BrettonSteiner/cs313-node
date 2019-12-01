@@ -1,5 +1,5 @@
 -- Drop old tables if they are there
---DROP TABLE Users;
+DROP TABLE Users;
 DROP TABLE Majors;
 DROP TABLE Colleges;
 DROP TABLE Apartments;
@@ -44,12 +44,12 @@ CREATE TABLE Majors (
 	collegeId	INT REFERENCES Colleges(id)
 );
 
-/*CREATE TABLE Users (
+CREATE TABLE Users (
 	id			SERIAL PRIMARY KEY,
 	username	VARCHAR NOT NULL,
 	password	VARCHAR NOT NULL,
 	admin   	BOOLEAN
-);*/
+);
 
 -- Populate new tables with data
 -- -- Create I-Teams  
@@ -113,4 +113,4 @@ INSERT INTO Majors (name, collegeId) VALUES('Biology',1);
 INSERT INTO Majors (name, collegeId) VALUES('Agricultural Science',1);
 SELECT * FROM Majors;
 -- -- Create Users
---INSERT INTO Users (username, password, admin) VALUES('admin','admin',true);
+INSERT INTO Users (username, password, admin) VALUES('admin','admin',true);

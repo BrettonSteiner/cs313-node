@@ -1,5 +1,11 @@
 html, header, body, footer {
     margin: 0;
+    height: 100%;
+}
+
+/* Make room for sticky footer */
+body {
+    padding-bottom: 75px;
 }
 
 header, footer {
@@ -56,7 +62,7 @@ ul.nav li a:hover {
     background-color: #dddddd;
 }
 
-#modal-root {
+/*#modal-root {
     position: fixed;
     overflow: hidden;
     background-color: rgba(0, 0, 0, 0.4);
@@ -85,11 +91,11 @@ ul.nav li a:hover {
     top: 25%;
     transform: translateY(-50%);
     text-align: center;
-}
+}*/
 
-.content {
-    width: 80%;
-    margin: auto;
+small {
+    display: none;
+    color: red;
 }
 
 table {
@@ -119,9 +125,12 @@ table th {
     color: white;
 }
 
-footer p {
-    margin: auto;
-    margin-top: 20px;
+footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 75px;
     text-align: center;
     padding: 27px 0px;
 }

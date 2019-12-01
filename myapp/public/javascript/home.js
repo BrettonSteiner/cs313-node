@@ -1,14 +1,42 @@
 function getInfo() {
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("results").innerHTML = this.responseText;
+    var majorName = $("#majorName").val();
+    var complex = $("#complex").val();
+    var apartment = $("#apartment").val();
+
+    if (majorName != "") {
+        var data = {
+            "majorName": majorName
         }
-    };
 
-    var majorName = document.getElementById("majorName").value;
-	var urlParameters = "?majorName=" + majorName;
+        $.ajax({
+            type: "GET",
+            url: '/getMajorInfo',
+            data: data,
+            success: majorInfo
+        })
+    }
 
-    xmlhttp.open("GET", "/getInfo" + urlParameters, true);
-    xmlhttp.send();
+    if (complex != "" && apartment != "") {
+        var data = {
+            "complex": complex,
+            "apartment": apartment
+        }
+
+        $.ajax({
+            type: "GET",
+            url: '/getITeamInfo',
+            data: data,
+            success: iTeamInfo
+        })
+    }
+}
+
+function majorInfo(results) {
+    if (results != undefined)
+        $("#majorResults").text(results);
+}
+
+function iTeamInfo(results) {
+    if (results != undefined)
+        $("#iTeamResults").text(results);
 }
