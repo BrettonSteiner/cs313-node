@@ -29,24 +29,10 @@ function signUp() {
     var password = $("#pwd").val();
     var cpassword = $("#cpwd").val();
 
-    var validInput = true;
-    /* Should check if the username is available in the future
-    if (!isUsernameAvailable(username)) {
-        validInput = false;
-        $("#usernameError").show();
-    }
-    else
-        $("#usernameError").hide();
-    */
+    var validUsername = availableUsername(username);
+    var validPassword = doPasswordsMatch(password, cpassword);
 
-    if (password != cpassword) {
-        validInput = false;
-        $("#passwordError").show();
-    }
-    else
-        $("#passwordError").hide();
-
-    if (validInput) {
+    if (validUsername && validPassword) {
         var data = {
             "username": username,
             "password": password,
@@ -67,7 +53,150 @@ function accountCreated(result) {
         window.location.href = "/sign-in";
     else {
         $("#modalTitle").text("Server Error:");
-        $("#modalBody").text(result);
+        $("#modalBody").html("<p>" + result + "</p>");
         $("#myModal").modal('show');
     }
+}
+
+function changeUsernameForm() {
+    var usernameChange = $("#usernameChange");
+    usernameChangeForm = '<form><div class="form-group"><label for="username">Username:</label><input type="text" class="form-control" id="username" name="username">' +
+    '<small id="usernameError" class="error">Username is not available.</small></div>' +
+    '<button type="button" onClick="changeUsername()" class="btn btn-primary">Change Username</button></form>';
+
+    usernameChange.html(usernameChangeForm);
+}
+
+function changeUsername() {
+    var username = $("#username").val();
+
+    var validUsername = availableUsername(username);
+
+    if (validUsername) {
+        var data = {
+            "username": username
+        }
+
+        $.ajax({
+            type: "POST",
+            url: '/changeUsername',
+            data: data,
+            success: changedUsername
+        })
+    }
+}
+
+function changedUsername(result) {
+    if (result == "Success")
+        $("#usernameChange").text("Username changed.");
+    else {
+        $("#modalTitle").text("Server Error:");
+        $("#modalBody").html("<p>" + result + "</p>");
+        $("#myModal").modal('show');
+    }
+}
+
+function changePasswordForm() {
+    var pwdChange = $("#pwdChange");
+    var pwdChangeForm = '<form><div class="form-group"><label for="pwd">Password:</label><input type="password" class="form-control" id="pwd" name="pwd"></div>' +
+        '<div class="form-group"><label for="cpwd">Confirm Password:</label><input type="password" class="form-control" id="cpwd" name="cpwd">' +
+        '<small id="passwordError" class="error">Passwords don\'t match.</small></div>' +
+        '<button type="button" onClick="changePassword()" class="btn btn-primary">Change Password</button></form>';
+    
+    pwdChange.html(pwdChangeForm);
+}
+
+function changePassword() {
+    var pwd = $("#pwd").val();
+    var cpwd = $("#cpwd").val();
+    validPassword = doPasswordsMatch(pwd, cpwd);
+
+    if (validPassword) {
+        var data = {
+            "password": pwd
+        }
+
+        $.ajax({
+            type: "POST",
+            url: '/changePassword',
+            data: data,
+            success: changedPassword
+        })
+    }
+}
+
+function changedPassword(result) {
+    if (result == "Success")
+        $("#pwdChange").text("Password changed.")
+    else {
+        $("#modalTitle").text("Server Error:");
+        $("#modalBody").html("<p>" + result + "</p>");
+        $("#myModal").modal('show');
+    }
+}
+
+function op() {
+    $.ajax({
+        type: "POST",
+        url: '/toggleAdmin',
+        success: toggledAdmin
+    })
+}
+
+function toggledAdmin(result) {
+    if (result == "Success")
+        $("#op").prop("checked", !$("#op").prop("checked"));
+    else {
+        $("#modalTitle").text("Server Error:");
+        $("#modalBody").html("<p>" + result + "</p>");
+        $("#myModal").modal('show');
+    }
+}
+
+function availableUsername(username) {
+    validUsername = true;
+    if (!isAvailableUsername(username)) {
+        validUsername = false;
+        $("#usernameError").show();
+    }
+    else
+        $("#usernameError").hide();
+
+    return validUsername;
+}
+
+function isAvailableUsername(username) {
+    var data = {
+        "username": username
+    }
+
+    $.ajax({
+        type: "GET",
+        url: '/availableUsername',
+        data: data,
+        success: availableUsernameResult
+    })
+}
+
+function availableUsernameResult(result) {
+    if (result == "Success") {
+        console.log("Username is available");
+        return true;
+    }
+    else {
+        console.log("Username is not available");
+        return false;
+    }
+}
+
+function doPasswordsMatch(pwd, cpwd) {
+    validInput = true;
+    if (pwd != cpwd) {
+        validInput = false;
+        $("#passwordError").show();
+    }
+    else
+        $("#passwordError").hide();
+
+    return validInput;
 }
