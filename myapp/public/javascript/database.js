@@ -4,7 +4,7 @@ function clickMajors() {
         $("#complexesTab").removeClass("active");
         $("#apartmentsTab").removeClass("active");
 
-        $("#include").load("./major.html");
+        $("#tableHead").load("./major.html");
         getMajors();
     }
 }
@@ -15,7 +15,7 @@ function clickComplexes() {
         $("#complexesTab").addClass("active");
         $("#apartmentsTab").removeClass("active");
 
-        $("#include").load("./complex.html");
+        $("#tableHead").load("./complex.html");
         getComplexes();
     }
 }
@@ -26,67 +26,40 @@ function clickApartments() {
         $("#complexesTab").removeClass("active");
         $("#apartmentsTab").addClass("active");
 
-        $("#include").load("./apartment.html");
+        $("#tableHead").load("./apartment.html");
         getApartments();
     }
 }
 
 function getMajors() {
-    var recordId = $("#recordId").val();
-    var name = $("#name").val();
-    var college = $("#college").val();
-    $('#searchResults').addClass('loading');
-
-    var data = {
-        "id": recordId,
-        "name": name,
-        "college": college
-    }
+    $("#recordsTable").DataTable().clear().destroy();
 
     $.ajax({
         type: "GET",
         url: '/getMajors',
-        data: data,
+        data: {},
         success: getMajorResults
     })
 }
 
 function getComplexes() {
-    var recordId = $("#recordId").val();
-    var name = $("#name").val();
-    $('#searchResults').addClass('loading');
-
-    var data = {
-        "id": recordId,
-        "name": name
-    }
+    $("#recordsTable").DataTable().clear().destroy();
 
     $.ajax({
         type: "GET",
         url: '/getComplexes',
-        data: data,
+        data: {},
         success: getComplexResults
     })
 }
 
 function getApartments() {
-    var recordId = $("#recordId").val();
-    var number = $("#number").val();
-    var complex = $("#complex").val();
-    var iteam = $("#iteam").val();
-    $('#searchResults').addClass('loading');
-
-    var data = {
-        "id": recordId,
-        "number": number,
-        "complex": complex,
-        "iteam": iteam
-    }
+    $("#recordsTable").DataTable().clear().destroy();
 
     $.ajax({
         type: "GET",
         url: '/getApartments',
-        data: data,
+        data: {},
         success: getApartmentResults
     })
 }
@@ -96,15 +69,14 @@ function getMajorResults(results) {
         $("#modalTitle").text("Server Error:");
         $("#modalBody").html("<p>" + result + "</p>");
         $("#myModal").modal({backdrop: true, show: true});
-        $('#searchResults').removeClass('loading');
     }
     else {
-        var html = "<tr><th>Record Id</th><th>Major Name</th><th>College Id</th></tr>";
+        var html = '';
         $.each(results, function(index, result) {
             html += '<tr onclick="selectMajorRecord(' + result.id + ')"><td>' + result.id + '</td><td>' + result.name + '</td><td>' + result.collegeid + '</td></tr>';
         });
         $("#searchResults").html(html);
-        $('#searchResults').removeClass('loading');
+        $("#recordsTable").DataTable();
     }
 }
 
@@ -113,16 +85,15 @@ function getComplexResults(results) {
         $("#modalTitle").text("Server Error:");
         $("#modalBody").html("<p>" + result + "</p>");
         $("#myModal").modal({backdrop: true, show: true});
-        $('#searchResults').removeClass('loading');
     }
     else {
-        var html = "<tr><th>Record Id</th><th>Complex Name</th></tr>";
+        var html = '';
         $.each(results, function(index, result) {
             html += '<tr onclick="selectComplexRecord(' + result.id + ')"><td>' + result.id + '</td><td>' + result.name + '</td></tr>';
         });
 
         $("#searchResults").html(html);
-        $('#searchResults').removeClass('loading');
+        $("#recordsTable").DataTable();
     }
 }
 
@@ -131,16 +102,15 @@ function getApartmentResults(results) {
         $("#modalTitle").text("Server Error:");
         $("#modalBody").html("<p>" + result + "</p>");
         $("#myModal").modal({backdrop: true, show: true});
-        $('#searchResults').removeClass('loading');
     }
     else {
-        var html = "<tr><th>Record Id</th><th>Apartment Number</th><th>Complex Id</th><th>I-Team Id</th></tr>";
+        var html = '';
         $.each(results, function(index, result) {
             html += '<tr onclick="selectApartmentRecord(' + result.id + ')"><td>' + result.id + '</td><td>' + result.number + '</td><td>' + result.complexid + '</td><td>' + result.iteamid + '</td></tr>';
         });
 
         $("#searchResults").html(html);
-        $('#searchResults').removeClass('loading');
+        $("#recordsTable").DataTable();
     }
 }
 
@@ -230,7 +200,7 @@ function getApartmentRecord(results) {
             + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>'
             + '<button class="btn btn-primary" type="button" onClick="updateApartment(' + results.id + ', ' + results.iteamid + ', ' + results.iteamid + ')" data-dismiss="modal">Save Changes</button>';
 
-        $("#modalTitle").text("Major Record " + results.id);
+        $("#modalTitle").text("Apartment Record " + results.id);
         $("#modalBody").html(modalBody);
         $("#modalFooter").html(modalFooter);
         $("#myModal").modal({backdrop: 'static', show: true});
@@ -261,7 +231,7 @@ function updateMajor(id, collegeid) {
 function updateComplex(id) {
     var oldName = $('#modalName').attr('placeholder');
     var newName = $('#modalName').val();
-    console.log(oldName, newName);
+
     if (oldName != newName) {
         var data = {
             "id": id,
@@ -373,4 +343,106 @@ function deleteApartment(id) {
         data: data,
         success: apartmentUpdated
     })
+}
+
+function createNewRecord() {
+    if ($("#majorsTab").hasClass("active"))
+        createMajorForm();
+    else if ($("#complexesTab").hasClass("active"))
+        createComplexForm();
+    else if ($("#apartmentsTab").hasClass("active"))
+        createApartmentForm();
+}
+
+function createMajorForm() {
+    var modalBody = '<form><div class="form-group"><label for="modalName">Major Name</label><input type="text" class="form-control" id="modalName" placeholder="Major Name"></div>'
+        + '<div class="form-group"><label for="modalCollegeId">College Id</label><input type="text" class="form-control" id="modalCollegeId" placeholder="College Id"></div></form>';
+    var modalFooter = '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>'
+        + '<button class="btn btn-primary" type="button" onClick="createMajor()" data-dismiss="modal">Create</button>';
+
+    $("#modalTitle").text("Create New Major");
+    $("#modalBody").html(modalBody);
+    $("#modalFooter").html(modalFooter);
+    $("#myModal").modal({backdrop: 'static', show: true});
+}
+
+function createComplexForm() {
+    var modalBody = '<form><div class="form-group"><label for="modalName">Complex Name</label><input type="text" class="form-control" id="modalName" id="modalName" placeholder="Complex Name"></div></form>';
+    var modalFooter = '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>'
+        + '<button class="btn btn-primary" type="button" onClick="createComplex()" data-dismiss="modal">Create</button>';
+
+    $("#modalTitle").text("Create New Complex");
+    $("#modalBody").html(modalBody);
+    $("#modalFooter").html(modalFooter);
+    $("#myModal").modal({backdrop: 'static', show: true});
+}
+
+function createApartmentForm() {
+    var modalBody = '<form><div class="form-group"><label for="modalNumber">Apartment Number</label><input type="text" class="form-control" id="modalNumber" placeholder="Apartment Number"></div>'
+        + '<div class="form-group"><label for="modalComplexId">Complex Id</label><input type="text" class="form-control" id="modalComplexId" placeholder="Complex Id"></div>'
+        + '<div class="form-group"><label for="modaliTeamId">I-Team Id</label><input type="text" class="form-control" id="modaliTeamId" placeholder="I-Team Id"></div></form>';
+    var modalFooter = '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>'
+        + '<button class="btn btn-primary" type="button" onClick="createApartment()" data-dismiss="modal">Create</button>';
+
+    $("#modalTitle").text("Create New Apartment");
+    $("#modalBody").html(modalBody);
+    $("#modalFooter").html(modalFooter);
+    $("#myModal").modal({backdrop: 'static', show: true});
+}
+
+function createMajor() {
+    var name = $('#modalName').val();
+    var collegeId = $('#modalCollegeId').val();
+
+    if (name != '' && collegeId != '') {
+        var data = {
+            "name": name,
+            "collegeid": collegeId
+        }
+    
+        $.ajax({
+            type: "PUT",
+            url: '/createMajor',
+            data: data,
+            success: majorUpdated
+        })
+    }
+}
+
+function createComplex() {
+    var name = $('#modalName').val();
+
+    if (name != '') {
+        var data = {
+            "name": name
+        }
+    
+        $.ajax({
+            type: "PUT",
+            url: '/createComplex',
+            data: data,
+            success: complexUpdated
+        })
+    }
+}
+
+function createApartment() {
+    var number = $('#modalNumber').val();
+    var complexId = $('#modalComplexId').val();
+    var iTeamId = $('#modaliTeamId').val();
+
+    if (number != '' && complexId != '' && iTeamId != '') {
+        var data = {
+            "number": number,
+            "complexid": complexId,
+            "iteamid": iTeamId
+        }
+    
+        $.ajax({
+            type: "PUT",
+            url: '/createApartment',
+            data: data,
+            success: apartmentUpdated
+        })
+    }
 }

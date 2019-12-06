@@ -6,36 +6,31 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" type="text/css" href="/css/byuistyle.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
     <script type="text/javascript" src="/javascript/database.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
     <title>Binder - Get Connected</title>
 </head>
 <body>
     <% include partials/header.ejs %>
     <% include partials/navbar.ejs %>
     <% include partials/modal.ejs %>
-    <div id="mainBody" class="container">
+    <div class="container">
         <h1>Database</h1>
         <% include partials/nav.ejs %>
-        <div id="include">
-            <div class="row">
-                <div class="col-3">
-                    <div class="container">
-                        <br>
-                        <h5>Select record type</h5>
-                    </div>
-                </div>
-                <div class="col-9">
-                    <table>
-                        <tr>
-                            <th>Record Id</th>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
+        <button type="button" class="btn btn-primary" onClick="createNewRecord()">Create New</button> or Select Record
+        <table id="recordsTable" class="table table-striped table-bordered table-hover">
+            <thead id="tableHead">
+                <tr>
+                    <th>Record Id</th>
+                </tr>
+            </thead>
+            <tbody id="searchResults"></tbody>
+        </table>
     </div>
     <% include partials/footer.ejs %>
 </body>

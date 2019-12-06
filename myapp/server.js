@@ -35,14 +35,17 @@ app.set('port', process.env.PORT || 8080)
    .get('/getMajor', controller.getMajor)
    .post('/updateMajor', controller.updateMajor)
    .post('/deleteMajor', controller.deleteMajor)
+   .put('/createMajor', controller.createMajor)
    .get('/getComplexes', controller.getComplexes)
    .get('/getComplex', controller.getComplex)
    .post('/updateComplex', controller.updateComplex)
    .post('/deleteComplex', controller.deleteComplex)
+   .put('/createComplex', controller.createComplex)
    .get('/getApartments', controller.getApartments)
    .get('/getApartment', controller.getApartment)
    .post('/updateApartment', controller.updateApartment)
    .post('/deleteApartment', controller.deleteApartment)
+   .put('/createApartment', controller.createApartment)
    .listen(app.get('port'), function(){
        console.log('Listening on port: ' + app.get('port'));
    });

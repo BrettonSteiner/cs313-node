@@ -1,9 +1,9 @@
 module.exports = {createAccount: createAccount, login: login, changePassword: changePassword, 
     availableUsername: availableUsername, changeUsername: changeUsername, toggleAdmin: toggleAdmin, 
     getMajorInfo: getMajorInfo, getITeamInfo: getITeamInfo,
-    getMajors: getMajors, getMajor: getMajor, updateMajor: updateMajor, deleteMajor: deleteMajor,
-    getComplexes: getComplexes, getComplex: getComplex, updateComplex: updateComplex, deleteComplex: deleteComplex,
-    getApartments: getApartments, getApartment: getApartment, updateApartment: updateApartment, deleteApartment: deleteApartment};
+    getMajors: getMajors, getMajor: getMajor, updateMajor: updateMajor, deleteMajor: deleteMajor, createMajor: createMajor,
+    getComplexes: getComplexes, getComplex: getComplex, updateComplex: updateComplex, deleteComplex: deleteComplex, createComplex: createComplex,
+    getApartments: getApartments, getApartment: getApartment, updateApartment: updateApartment, deleteApartment: deleteApartment, createApartment: createApartment};
 
 require('dotenv').config({path: __dirname + '/../variables.env'});
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0; //This will need to be deactivated for Heroku at some point... Meant to only be used locally
@@ -143,30 +143,9 @@ function getITeamInfo(req, res) {
 }
 
 function getMajors(req, res) {
-    const { id, name, college } = req.query;
-    var sql = 'SELECT id, name, collegeId FROM Majors';
-    var values = [];
-
-    if (!empty(id) || !empty(name) || !empty(college)) {
-        sql += ' WHERE';
-
-        if (!empty(id))
-            sql += ' id = $' + values.push(id);
-        if (!empty(name)) {
-            if (values.length > 0)
-                sql += ' AND';
-            sql += ' name = $' + values.push(name);
-        }
-        if (!empty(college)) {
-            if (values.length > 0)
-                sql += ' AND';
-            sql += ' collegeid = $' + values.push(college);
-        }
-    }
-    sql += ' ORDER BY id';
-    console.log(sql, values);
+    var sql = 'SELECT id, name, collegeId FROM Majors ORDER BY id';
     
-    pool.query(sql, values, function(err, result) {
+    pool.query(sql, function(err, result) {
         // If an error occurred...
         if (err) {
             console.log("Error in query: ")
@@ -247,26 +226,32 @@ function deleteMajor(req, res) {
     });
 }
 
-function getComplexes(req, res) {
-    const { id, name } = req.query;
-    var sql = 'SELECT id, name FROM Complexes';
-    var values = [];
+function createMajor(req, res) {
+    const { name, collegeid } = req.body;
+    var sql = 'INSERT INTO Majors (name, collegeid) VALUES ($1, $2)';
+    var values = [ name, collegeid ];
 
-    if (!empty(id) || !empty(name)) {
-        sql += ' WHERE';
-
-        if (!empty(id))
-            sql += ' id = $' + values.push(id);
-        if (!empty(name)) {
-            if (values.length > 0)
-                sql += ' AND';
-            sql += ' name = $' + values.push(name);
-        }
-    }
-    sql += ' ORDER BY id';
-    console.log(sql, values);
-    
     pool.query(sql, values, function(err, result) {
+        // If an error occurred...
+        if (err) {
+            console.log("Error in query: ")
+            console.log(err);
+        }
+    
+        // Log this to the console for debugging purposes.
+        console.log("Back from DB with result:");
+        console.log(result.rows);
+        if (result.rows != undefined)
+            res.json("Success");
+        else
+            res.end("Fail");
+    });
+}
+
+function getComplexes(req, res) {
+    var sql = 'SELECT id, name FROM Complexes ORDER BY id';
+
+    pool.query(sql, function(err, result) {
         // If an error occurred...
         if (err) {
             console.log("Error in query: ")
@@ -347,36 +332,32 @@ function deleteComplex(req, res) {
     });
 }
 
-function getApartments(req, res) {
-    const { id, number, complex, iteam } = req.query;
-    var sql = 'SELECT id, number, complexid, iteamid FROM Apartments';
-    var values = [];
+function createComplex(req, res) {
+    const name = req.body.name;
+    var sql = 'INSERT INTO Complexes (name) VALUES ($1)';
+    var values = [ name ];
 
-    if (!empty(id) || !empty(number) || !empty(complex) || !empty(iteam)) {
-        sql += ' WHERE';
-
-        if (!empty(id))
-            sql += ' id = $' + values.push(id);
-        if (!empty(number)) {
-            if (values.length > 0)
-                sql += ' AND';
-            sql += ' number = $' + values.push(number);
-        }
-        if (!empty(complex)) {
-            if (values.length > 0)
-                sql += ' AND';
-            sql += ' complexid = $' + values.push(complex);
-        }
-        if (!empty(iteam)) {
-            if (values.length > 0)
-                sql += ' AND';
-            sql += ' iteamid = $' + values.push(iteam);
-        }
-    }
-    sql += ' ORDER BY id';
-    console.log(sql, values);
-    
     pool.query(sql, values, function(err, result) {
+        // If an error occurred...
+        if (err) {
+            console.log("Error in query: ")
+            console.log(err);
+        }
+    
+        // Log this to the console for debugging purposes.
+        console.log("Back from DB with result:");
+        console.log(result.rows);
+        if (result.rows != undefined)
+            res.json("Success");
+        else
+            res.end("Fail");
+    });
+}
+
+function getApartments(req, res) {
+    var sql = 'SELECT id, number, complexid, iteamid FROM Apartments ORDER BY id';
+    
+    pool.query(sql, function(err, result) {
         // If an error occurred...
         if (err) {
             console.log("Error in query: ")
@@ -439,6 +420,28 @@ function updateApartment(req, res) {
 function deleteApartment(req, res) {
     var sql = 'DELETE FROM Apartments WHERE id = $1';
     var values = [ req.body.id ];
+
+    pool.query(sql, values, function(err, result) {
+        // If an error occurred...
+        if (err) {
+            console.log("Error in query: ")
+            console.log(err);
+        }
+    
+        // Log this to the console for debugging purposes.
+        console.log("Back from DB with result:");
+        console.log(result.rows);
+        if (result.rows != undefined)
+            res.json("Success");
+        else
+            res.end("Fail");
+    });
+}
+
+function createApartment(req, res) {
+    const { number, complexid, iteamid } = req.body;
+    var sql = 'INSERT INTO Apartments (number, complexid, iteamid) VALUES ($1, $2, $3)';
+    var values = [ number, complexid, iteamid ];
 
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
