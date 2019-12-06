@@ -1,7 +1,7 @@
 {
   "name": "cs313-node",
   "version": "1.0.0",
-  "description": "Milestone 1",
+  "description": "Milestone 3",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

@@ -3,6 +3,7 @@
 ################################################################################
 
 /week09/TeamActivity/node_modules
+/week12/InClass
 /.vs
 /node_modules
 variables.env

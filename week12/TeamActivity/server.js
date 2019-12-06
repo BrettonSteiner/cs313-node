@@ -45,11 +45,11 @@ app.set('port', process.env.PORT || 8080)
                if (err) {
                   console.log("An error occured... \n" + err);
                }
-   
+               
                if (result == true) {
                   success = true;
+                  req.session.username = username;
                }
-               req.session.username = username;
                var json = {success: success};
                res.json(json);
             });
@@ -61,12 +61,12 @@ app.set('port', process.env.PORT || 8080)
    })
    .post('/logout', (req, res) => {
       var success = false;
-
+      
       if (req.session.username != null) {
          req.session.destroy();
          success = true;
       }
-
+      
       var json = { success: success };
       res.json(json);
    })

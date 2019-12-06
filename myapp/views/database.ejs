@@ -16,19 +16,16 @@
     <% include partials/header.ejs %>
     <% include partials/navbar.ejs %>
     <% include partials/modal.ejs %>
-    <div class="container">
+    <div id="mainBody" class="container">
         <h1>Database</h1>
         <% include partials/nav.ejs %>
         <div id="include">
             <div class="row">
                 <div class="col-3">
-                    <form>
-                        <div class="form-group">
-                            <label for="recordId">Record Id</label>
-                            <input type="text" class="form-control" id="recordId" placeholder="Record Id" disabled>
-                        </div>
-                        <button class="btn btn-primary" type="button" disabled>Search</button>
-                    </form>
+                    <div class="container">
+                        <br>
+                        <h5>Select record type</h5>
+                    </div>
                 </div>
                 <div class="col-9">
                     <table>
