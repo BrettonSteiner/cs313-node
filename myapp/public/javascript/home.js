@@ -3,6 +3,10 @@ function getInfo() {
     var complex = $("#complex").val();
     var apartment = $("#apartment").val();
 
+    var initialModalHtml = '<div id="majorResults"></div><div id="iTeamResults"></div><div id="mentorResults"></div>'
+    $("#modalBody").html(initialModalHtml);
+    $("#modalTitle").text("Get Connected Information Results");
+
     if (majorName != "") {
         var data = {
             "majorName": majorName
@@ -10,9 +14,9 @@ function getInfo() {
 
         $.ajax({
             type: "GET",
-            url: '/getMajorInfo',
+            url: '/getMajorColor',
             data: data,
-            success: majorInfo
+            success: majorColor
         })
     }
 
@@ -24,19 +28,46 @@ function getInfo() {
 
         $.ajax({
             type: "GET",
-            url: '/getITeamInfo',
+            url: '/getITeamNumber',
             data: data,
-            success: iTeamInfo
+            success: iTeamNumber
         })
     }
 }
 
-function majorInfo(results) {
-    if (results != undefined)
-        $("#majorResults").text(results);
+function majorColor(results) {
+    if (results != undefined) {
+        var html = '<h3>Major Color:</h3><h6>' + results + '</h6>';
+        $("#majorResults").html(html);
+        $("#myModal").modal('show');
+    }
 }
 
-function iTeamInfo(results) {
-    if (results != undefined)
-        $("#iTeamResults").text(results);
+function iTeamNumber(results) {
+    if (results != undefined) {
+        var data = {
+            "iteamNumber": results
+        }
+
+        $.ajax({
+            type: "GET",
+            url: '/getMentorInfo',
+            data: data,
+            success: mentorInfo
+        })
+
+        var html = '<h3>I-Team Number:</h3><h6>' + results + '</h6>';
+        $("#iTeamResults").html(html);
+        $("#myModal").modal('show');
+    }
+}
+
+function mentorInfo(results) {
+    if (results != undefined) {
+        var html = '<h3>Mentors:</h3>';
+        $.each(results, function(index, result) {
+            html += '<h6>' + result.name + ': ' + result.phone + '</h6>';
+        });
+        $("#mentorResults").html(html);
+    }
 }

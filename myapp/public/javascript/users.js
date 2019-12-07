@@ -135,24 +135,6 @@ function changedPassword(result) {
     }
 }
 
-function op() {
-    $.ajax({
-        type: "POST",
-        url: '/toggleAdmin',
-        success: toggledAdmin
-    })
-}
-
-function toggledAdmin(result) {
-    if (result == "Success")
-        $("#op").prop("checked", !$("#op").prop("checked"));
-    else {
-        $("#modalTitle").text("Server Error:");
-        $("#modalBody").html("<p>" + result + "</p>");
-        $("#myModal").modal('show');
-    }
-}
-
 function availableUsername(username) {
     validUsername = true;
     if (!isAvailableUsername(username)) {

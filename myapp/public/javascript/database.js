@@ -4,7 +4,8 @@ function clickMajors() {
         $("#complexesTab").removeClass("active");
         $("#apartmentsTab").removeClass("active");
 
-        $("#tableHead").load("./major.html");
+        $("#recordsTable").DataTable().clear().destroy();
+        $("#tableHead").html("<tr><th>Record Id</th><th>Major Name</th><th>College Id</th></tr>");
         getMajors();
     }
 }
@@ -15,7 +16,8 @@ function clickComplexes() {
         $("#complexesTab").addClass("active");
         $("#apartmentsTab").removeClass("active");
 
-        $("#tableHead").load("./complex.html");
+        $("#recordsTable").DataTable().clear().destroy();
+        $("#tableHead").html("<tr><th>Record Id</th><th>Complex Name</th></tr>");
         getComplexes();
     }
 }
@@ -26,7 +28,8 @@ function clickApartments() {
         $("#complexesTab").removeClass("active");
         $("#apartmentsTab").addClass("active");
 
-        $("#tableHead").load("./apartment.html");
+        $("#recordsTable").DataTable().clear().destroy();
+        $("#tableHead").html("<tr><th>Record Id</th><th>Apartment Number</th><th>Complex Id</th><th>I-Team Id</th></tr>");
         getApartments();
     }
 }

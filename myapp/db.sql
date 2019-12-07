@@ -16,7 +16,7 @@ CREATE TABLE ITeams (
 CREATE TABLE Mentors (
 	id			SERIAL PRIMARY KEY,
 	name		VARCHAR NOT NULL,
-	phone		VARCHAR(10) NOT NULL,
+	phone		VARCHAR(20) NOT NULL,
 	iTeamId		INT REFERENCES ITeams(id)
 );
 
@@ -47,8 +47,7 @@ CREATE TABLE Majors (
 CREATE TABLE Users (
 	id			SERIAL PRIMARY KEY,
 	username	VARCHAR NOT NULL,
-	password	VARCHAR NOT NULL,
-	admin   	BOOLEAN
+	password	VARCHAR NOT NULL
 );
 
 -- Populate new tables with data
@@ -58,12 +57,12 @@ INSERT INTO ITeams (number) VALUES(2);
 INSERT INTO ITeams (number) VALUES(3);
 SELECT * FROM ITeams;
 -- -- Create Mentors (2 per I-Team)
-INSERT INTO Mentors (name, phone, iTeamId) VALUES('Sarah Denson','1235556789',1);
-INSERT INTO Mentors (name, phone, iTeamId) VALUES('Mike Haun','1235556790',1);
-INSERT INTO Mentors (name, phone, iTeamId) VALUES('Christy Bingham','2345556791',2);
-INSERT INTO Mentors (name, phone, iTeamId) VALUES('Andrew Allen','2345556792',2);
-INSERT INTO Mentors (name, phone, iTeamId) VALUES('Emily Duff','3455556793',3);
-INSERT INTO Mentors (name, phone, iTeamId) VALUES('Keaton Bennett','3455556794',3);
+INSERT INTO Mentors (name, phone, iTeamId) VALUES('Sarah Denson','(123)555-6789',1);
+INSERT INTO Mentors (name, phone, iTeamId) VALUES('Mike Haun','(123)555-6790',1);
+INSERT INTO Mentors (name, phone, iTeamId) VALUES('Christy Bingham','(234)555-6791',2);
+INSERT INTO Mentors (name, phone, iTeamId) VALUES('Andrew Allen','(234)555-6792',2);
+INSERT INTO Mentors (name, phone, iTeamId) VALUES('Emily Duff','(345)555-6793',3);
+INSERT INTO Mentors (name, phone, iTeamId) VALUES('Keaton Bennett','(345)555-6794',3);
 SELECT * FROM Mentors;
 -- -- Create Complexes
 INSERT INTO Complexes (name) VALUES('Somerset');
@@ -113,4 +112,5 @@ INSERT INTO Majors (name, collegeId) VALUES('Biology',1);
 INSERT INTO Majors (name, collegeId) VALUES('Agricultural Science',1);
 SELECT * FROM Majors;
 -- -- Create Users
-INSERT INTO Users (username, password, admin) VALUES('admin','admin',true);
+INSERT INTO Users (username, password) VALUES('guest','guest');
+INSERT INTO Users (username, password) VALUES('admin','admin');
