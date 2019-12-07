@@ -1,5 +1,5 @@
-module.exports = {createAccount: createAccount, login: login, changePassword: changePassword, 
-    availableUsername: availableUsername, changeUsername: changeUsername,
+module.exports = {createAccount: createAccount, login: login, loginGuest: loginGuest, logout: logout,
+    changePassword: changePassword, availableUsername: availableUsername, changeUsername: changeUsername,
     getMajorColor: getMajorColor, getITeamNumber: getITeamNumber, getMentorInfo: getMentorInfo,
     getMajors: getMajors, getMajor: getMajor, updateMajor: updateMajor, deleteMajor: deleteMajor, createMajor: createMajor,
     getComplexes: getComplexes, getComplex: getComplex, updateComplex: updateComplex, deleteComplex: deleteComplex, createComplex: createComplex,
@@ -11,10 +11,13 @@ process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0; //This will need to be deactiva
 const { Pool } = require('pg');
 const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({connectionString: connectionString})
+const bcrypt = require('bcrypt');
 
 function createAccount(req, res) {
-    var sql = 'INSERT INTO Users (username, password, admin) VALUES($1, $2, $3)';
-    var values = [req.body.username, req.body.password, req.body.admin];
+    var username = req.body.username;
+    var hash = bcrypt.hashSync(req.body.password, 10);
+    var sql = 'INSERT INTO Users (username, password) VALUES($1, $2)';
+    var values = [ username, hash ];
 
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
@@ -31,9 +34,10 @@ function createAccount(req, res) {
 }
 
 function login(req, res) {
-    var sql = 'SELECT id FROM Users WHERE username = $1 and password = $2';
-    var values = [req.body.username, req.body.password];
-    
+    var sql = 'SELECT id, username, password FROM Users WHERE username = $1';
+    var values = [req.body.username];
+    var success = false;
+
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
@@ -44,24 +48,98 @@ function login(req, res) {
         // Log this to the console for debugging purposes.
         console.log("Back from DB with result:");
         console.log(result.rows[0]);
-        if (result.rows[0] != undefined)
-            res.end("Success");
-        else
-            res.end("Username or Password incorrect.");
+        if (result.rows[0]) {
+            bcrypt.compare(req.body.password, result.rows[0].password, (err, result)=>{
+                if (err) {
+                    console.log("An error occured... \n" + err);
+                }
+                
+                if (result == true) {
+                    console.log("Login successful!");
+                    success = true;
+                    req.session.username = req.body.username;
+                }
+                res.json({ success: success });
+            });
+        }
+        else {
+            res.json({ success: success });
+        }
     });
 }
 
-function changePassword(req, res) {
-    var password = req.body.password;
-    console.log("New password: ", password);
+function loginGuest(req, res) {
+    if (req.session.username != "Guest") {
+        req.session.username = "Guest";
+    }
+    res.render("home");
+}
 
-    res.end("Success");
+function logout(req, res) {
+    if (req.session.username != null) {
+        console.log(req.session.username + " logged out.");
+        req.session.destroy();
+        res.render("sign-in");
+    }
+    else {
+        res.render("sign-in");
+    }
+}
+
+function changePassword(req, res) {
+    if (req.session.username != undefined) {
+        var hash = bcrypt.hashSync(req.body.password, 10);
+        var sql = 'UPDATE Users SET password = $2 WHERE username = $1';
+        var values = [ req.session.username, hash ];
+
+        pool.query(sql, values, function(err, result) {
+            // If an error occurred...
+            if (err) {
+                console.log("Error in query: " + err);
+                res.end("Error: " + err);
+            }
+        
+            // Log this to the console for debugging purposes.
+            console.log("Back from DB with result:");
+            console.log(result);
+            res.json({success: true});
+        });
+    }
+    else
+        res.json({success: false});
 }
 
 function availableUsername(req, res) {
-    var sql = 'SELECT id FROM Users WHERE username = $1';
-    var values = [req.query.username];
-    
+    if (req.query.username == "Guest") {
+        res.end("Username is not available");
+    }
+    else {
+        var sql = 'SELECT id FROM Users WHERE username = $1';
+        var values = [req.query.username];
+        
+        pool.query(sql, values, function(err, result) {
+            // If an error occurred...
+            if (err) {
+                console.log("Error in query: " + err);
+                res.end("Error: " + err);
+            }
+        
+            // Log this to the console for debugging purposes.
+            console.log("Back from DB with result:");
+            console.log(result.rows);
+            if (result.rows[0] != undefined)
+                res.end("Username is not available");
+            else
+                res.end("Success");
+        });
+    }
+}
+
+function changeUsername(req, res) {
+    var username = req.body.username;
+    var sql = "UPDATE Users SET username = $2 WHERE username = $1";
+    var values = [ req.session.username, username ];
+
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
@@ -71,19 +149,10 @@ function availableUsername(req, res) {
     
         // Log this to the console for debugging purposes.
         console.log("Back from DB with result:");
-        console.log(result.rows);
-        if (result.rows[0])
-            res.end("Username is not available");
-        else
-            res.end("Success");
+        console.log(result);
+        req.session.username = username;
+        res.json({success: true});
     });
-}
-
-function changeUsername(req, res) {
-    var username = req.body.username;
-    console.log("New username: ", username);
-
-    res.end("Success");
 }
 
 function getMajorColor(req, res) {

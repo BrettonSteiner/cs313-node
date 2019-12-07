@@ -17,7 +17,7 @@ function signIn() {
 }
 
 function logIn(result) {
-    if (result == "Success")
+    if (result.success)
         window.location.href = "/";
     else
         $("#loginError").show();
@@ -26,26 +26,49 @@ function logIn(result) {
 function signUp() {
     console.log("Entered signUp()");
     var username = $("#username").val();
-    var password = $("#pwd").val();
-    var cpassword = $("#cpwd").val();
-
-    var validUsername = availableUsername(username);
-    var validPassword = doPasswordsMatch(password, cpassword);
-
-    if (validUsername && validPassword) {
-        var data = {
-            "username": username,
-            "password": password,
-            "admin": 0
-        }
-
-        $.ajax({
-            type: "POST",
-            url: '/createAccount',
-            data: data,
-            success: accountCreated
-        })
+    var data = {
+        "username": username
     }
+
+    $.ajax({
+        type: "GET",
+        url: '/availableUsername',
+        data: data,
+        success: signUpUsernameResult
+    });
+}
+
+function signUpUsernameResult(results) {
+    if (results == "Success") {
+        console.log("Username is available");
+        $("#usernameError").hide();
+
+        var username = $("#username").val();
+        var password = $("#pwd").val();
+        var cpassword = $("#cpwd").val();
+
+        var validPassword = doPasswordsMatch(password, cpassword);
+
+        if (validPassword) {
+            var data = {
+                "username": username,
+                "password": password,
+                "admin": 0
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '/createAccount',
+                data: data,
+                success: accountCreated
+            })
+        }
+    }
+    else {
+        console.log("Username is not available");
+        $("#usernameError").show();
+        doPasswordsMatch(password, cpassword);
+    } 
 }
 
 function accountCreated(result) {
@@ -70,9 +93,25 @@ function changeUsernameForm() {
 function changeUsername() {
     var username = $("#username").val();
 
-    var validUsername = availableUsername(username);
+    var data = {
+        "username": username
+    }
 
-    if (validUsername) {
+    $.ajax({
+        type: "GET",
+        url: '/availableUsername',
+        data: data,
+        success: changeUsernameResult
+    });
+}
+
+function changeUsernameResult(results) {
+    if (results == "Success") {
+        console.log("Username is available");
+        $("#usernameError").hide();
+
+        var username = $("#username").val();
+
         var data = {
             "username": username
         }
@@ -83,11 +122,16 @@ function changeUsername() {
             data: data,
             success: changedUsername
         })
+
+    }
+    else {
+        console.log("Username is not available");
+        $("#usernameError").show();
     }
 }
 
 function changedUsername(result) {
-    if (result == "Success")
+    if (result.success)
         $("#usernameChange").text("Username changed.");
     else {
         $("#modalTitle").text("Server Error:");
@@ -126,48 +170,12 @@ function changePassword() {
 }
 
 function changedPassword(result) {
-    if (result == "Success")
+    if (result.success)
         $("#pwdChange").text("Password changed.")
     else {
         $("#modalTitle").text("Server Error:");
         $("#modalBody").html("<p>" + result + "</p>");
         $("#myModal").modal('show');
-    }
-}
-
-function availableUsername(username) {
-    validUsername = true;
-    if (!isAvailableUsername(username)) {
-        validUsername = false;
-        $("#usernameError").show();
-    }
-    else
-        $("#usernameError").hide();
-
-    return validUsername;
-}
-
-function isAvailableUsername(username) {
-    var data = {
-        "username": username
-    }
-
-    $.ajax({
-        type: "GET",
-        url: '/availableUsername',
-        data: data,
-        success: availableUsernameResult
-    })
-}
-
-function availableUsernameResult(result) {
-    if (result == "Success") {
-        console.log("Username is available");
-        return true;
-    }
-    else {
-        console.log("Username is not available");
-        return false;
     }
 }
 

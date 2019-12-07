@@ -111,6 +111,3 @@ INSERT INTO Majors (name, collegeId) VALUES('Business',2);
 INSERT INTO Majors (name, collegeId) VALUES('Biology',1);
 INSERT INTO Majors (name, collegeId) VALUES('Agricultural Science',1);
 SELECT * FROM Majors;
--- -- Create Users
-INSERT INTO Users (username, password) VALUES('guest','guest');
-INSERT INTO Users (username, password) VALUES('admin','admin');
