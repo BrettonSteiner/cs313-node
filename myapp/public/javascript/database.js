@@ -1,3 +1,18 @@
+function userInfo() {
+    $.ajax({
+        type: "GET",
+        url: '/isLoggedIn',
+        success: userInfoResults
+    });
+}
+
+function userInfoResults(result) {
+    if (result.success) {
+        var html = '<span><span class="user">' + result.username + '</span><a href="/logout"><button type="button" class="btn btn-light">Logout</button></a><span>';
+        $("#userInfo").html(html);
+    }
+}
+
 function clickMajors() {
     if (!$("#majorsTab").hasClass("active")) {
         $("#majorsTab").addClass("active");

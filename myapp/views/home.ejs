@@ -12,10 +12,12 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <title>Binder - Get Connected</title>
 </head>
-<body>
-    <% include partials/header.ejs %>
-    <% include partials/navbar.ejs %>
-    <% include partials/modal.ejs %>
+<body onload="userInfo()">
+    <div>
+        <% include partials/header.ejs %>
+        <% include partials/navbar.ejs %>
+        <% include partials/modal.ejs %>
+    </div>
     <div class="container">
         <h1>Get Student Information</h1>
         <form action="">

@@ -1,3 +1,19 @@
+function userInfo() {
+    $.ajax({
+        type: "GET",
+        url: '/isLoggedIn',
+        success: userInfoResults
+    });
+}
+
+function userInfoResults(result) {
+    if (result.success) {
+        var html = '<span><span class="user">' + result.username + '</span><a href="/logout"><button type="button" class="btn btn-light">Logout</button></a><span>';
+        $("#userInfo").html(html);
+        $("#currentUsername").text(result.username);
+    }
+}
+
 function signIn() {
     var username = $("#username").val();
     var password = $("#pwd").val();
@@ -107,7 +123,6 @@ function changeUsername() {
 
 function changeUsernameResult(results) {
     if (results == "Success") {
-        console.log("Username is available");
         $("#usernameError").hide();
 
         var username = $("#username").val();
@@ -131,8 +146,11 @@ function changeUsernameResult(results) {
 }
 
 function changedUsername(result) {
-    if (result.success)
-        $("#usernameChange").text("Username changed.");
+    if (result.success) {
+        var html = '<h3>Username: <span id="currentUsername">username</span></h3>Username changed.';
+        $("#usernameChange").html(html);
+        userInfo();
+    }
     else {
         $("#modalTitle").text("Server Error:");
         $("#modalBody").html("<p>" + result + "</p>");

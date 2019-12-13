@@ -17,7 +17,7 @@ app.set('port', process.env.PORT || 8080)
    }))
    .set('views', __dirname + '/views')
    .set('view engine', 'ejs')
-   .get('/', verifyLogin, (req, res) => {
+   .get('/', (req, res) => {
        res.render("home");
    })
    .get('/database', verifyLogin, (req, res) => {
@@ -34,7 +34,6 @@ app.set('port', process.env.PORT || 8080)
    })
    .post('/createAccount', controller.createAccount)
    .post('/login', controller.login)
-   .get('/loginGuest', controller.loginGuest)
    .get('/logout', controller.logout)
    .post('/changePassword', verifyLogin, controller.changePassword)
    .get('/availableUsername', controller.availableUsername)
@@ -57,19 +56,14 @@ app.set('port', process.env.PORT || 8080)
    .post('/updateApartment', verifyLogin, controller.updateApartment)
    .post('/deleteApartment', verifyLogin, controller.deleteApartment)
    .put('/createApartment', verifyLogin, controller.createApartment)
+   .get('/isLoggedIn', controller.isLoggedIn)
    .listen(app.get('port'), function(){
        console.log('Listening on port: ' + app.get('port'));
    });
 
 function verifyLogin (req, res, next) {
-    if (req.session.username != undefined && req.session.username != "Guest") {
-        console.log(req.session.username);
+    if (req.session.username != undefined)
         next();
-    }
-    else if (req.session.username == "Guest" && req.url == "/") {
-        console.log(req.session.username);
-        next();
-    }
     else if (req.url == "/" || req.url == "/database" || req.url == "/profile")
         res.render("sign-in");
     else {
@@ -77,10 +71,3 @@ function verifyLogin (req, res, next) {
         res.status(401).json(json);
     }
 }
-
-/* || req.url == "/sign-in" || req.url == "/sign-up"
-            || req.url == "/login" || req.url == "/loginGuest" || req.url == "/createAccount" || req.url == "/availableUsername") {
-        console.log(req.session.username);
-        next();
-    }
-    else if (req.session.username == "Guest" && req.url == "/") { */

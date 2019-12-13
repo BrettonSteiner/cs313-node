@@ -3,6 +3,12 @@ html, header, body, footer {
     height: 100%;
 }
 
+body {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 100%;
+}
+
 #header {
     background-color: #0076B6;
 }
@@ -15,6 +21,11 @@ html, header, body, footer {
     color: #ffffff;
     font-size: 35px;
     font-family: 'Times New Roman', Times, serif;
+}
+
+.user {
+    color: #ffffff;
+    padding-right: 10px;
 }
 
 footer {

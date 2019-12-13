@@ -1,9 +1,10 @@
-module.exports = {createAccount: createAccount, login: login, loginGuest: loginGuest, logout: logout,
+module.exports = {createAccount: createAccount, login: login, logout: logout,
     changePassword: changePassword, availableUsername: availableUsername, changeUsername: changeUsername,
     getMajorColor: getMajorColor, getITeamNumber: getITeamNumber, getMentorInfo: getMentorInfo,
     getMajors: getMajors, getMajor: getMajor, updateMajor: updateMajor, deleteMajor: deleteMajor, createMajor: createMajor,
     getComplexes: getComplexes, getComplex: getComplex, updateComplex: updateComplex, deleteComplex: deleteComplex, createComplex: createComplex,
-    getApartments: getApartments, getApartment: getApartment, updateApartment: updateApartment, deleteApartment: deleteApartment, createApartment: createApartment};
+    getApartments: getApartments, getApartment: getApartment, updateApartment: updateApartment, deleteApartment: deleteApartment, createApartment: createApartment,
+    isLoggedIn: isLoggedIn};
 
 require('dotenv').config({path: __dirname + '/../variables.env'});
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0; //This will need to be deactivated for Heroku at some point... Meant to only be used locally
@@ -66,13 +67,6 @@ function login(req, res) {
             res.json({ success: success });
         }
     });
-}
-
-function loginGuest(req, res) {
-    if (req.session.username != "Guest") {
-        req.session.username = "Guest";
-    }
-    res.render("home");
 }
 
 function logout(req, res) {
@@ -534,4 +528,11 @@ function createApartment(req, res) {
         else
             res.end("Fail");
     });
+}
+
+function isLoggedIn(req, res) {
+    if (req.session.username != undefined)
+        res.json({ success: true, username: req.session.username });
+    else
+        res.json({ success: false });
 }

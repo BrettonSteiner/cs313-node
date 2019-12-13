@@ -1,3 +1,24 @@
+function userInfo() {
+    $.ajax({
+        type: "GET",
+        url: '/isLoggedIn',
+        success: userInfoResults
+    });
+}
+
+function userInfoResults(result) {
+    if (result.success) {
+        var html = '<span><span class="user">' + result.username + '</span><a href="/logout"><button type="button" class="btn btn-light">Logout</button></a><span>';
+        $("#userInfo").html(html);
+        $("#navbar").show();
+    }
+    else {
+        var html = '<a href="/sign-in"><button type="button" class="btn btn-light">Login</button></a>';
+        $("#userInfo").html(html);
+        $("#navbar").hide();
+    }
+}
+
 function getInfo() {
     var majorName = $("#majorName").val();
     var complex = $("#complex").val();

@@ -9,8 +9,10 @@
     <title>Sign-Up</title>
 </head>
 <body>
-    <% include partials/header.ejs %>
-    <% include partials/modal.ejs %>
+    <div>
+        <% include partials/header.ejs %>
+        <% include partials/modal.ejs %>
+    </div>
 	<div class="container">
         <h1>Sign Up</h1>
         <form>
@@ -29,7 +31,6 @@
                 <small id="passwordError" class="error">Passwords don't match.</small>
             </div>
             <button type="button" onClick="signUp()" class="btn btn-primary">Create Account</button>
-            <button type="button" onClick="accountCreated('Something went wrong on the server side!')" class="btn btn-primary">Show Server Error Modal</button>
         </form>
         <br/>
         <div>Already have an account? <a href="/sign-in">Sign In</a></div>
