@@ -4,7 +4,7 @@ module.exports = {createAccount: createAccount, login: login, logout: logout,
     getMajors: getMajors, getMajor: getMajor, updateMajor: updateMajor, deleteMajor: deleteMajor, createMajor: createMajor,
     getComplexes: getComplexes, getComplex: getComplex, updateComplex: updateComplex, deleteComplex: deleteComplex, createComplex: createComplex,
     getApartments: getApartments, getApartment: getApartment, updateApartment: updateApartment, deleteApartment: deleteApartment, createApartment: createApartment,
-    isLoggedIn: isLoggedIn};
+    getColleges: getColleges, getITeams: getITeams, isLoggedIn: isLoggedIn};
 
 require('dotenv').config({path: __dirname + '/../variables.env'});
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0; //This will need to be deactivated for Heroku at some point... Meant to only be used locally
@@ -183,7 +183,6 @@ function getITeamNumber(req, res) {
     
         // Log this to the console for debugging purposes.
         console.log("Back from DB with result:");
-        console.log(result.rows);
         if (result.rows[0] != undefined)
             res.end(result.rows[0].number.toString());
         else
@@ -203,8 +202,7 @@ function getMentorInfo(req, res) {
         }
     
         // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+        console.log("Back from DB with result:")
         if (result.rows[0] != undefined)
             res.json(result.rows);
         else
@@ -525,6 +523,46 @@ function createApartment(req, res) {
         console.log(result.rows);
         if (result.rows != undefined)
             res.json("Success");
+        else
+            res.end("Fail");
+    });
+}
+
+function getColleges(req, res) {
+    var sql = 'SELECT id, name, color FROM Colleges';
+
+    pool.query(sql, function(err, result) {
+        // If an error occurred...
+        if (err) {
+            console.log("Error in query: ")
+            console.log(err);
+        }
+    
+        // Log this to the console for debugging purposes.
+        console.log("Back from DB with result:");
+        console.log(result.rows);
+        if (result.rows[0] != undefined)
+            res.json(result.rows);
+        else
+            res.end("Fail");
+    });
+}
+
+function getITeams(req, res) {
+    var sql = 'SELECT id, number FROM ITeams';
+
+    pool.query(sql, function(err, result) {
+        // If an error occurred...
+        if (err) {
+            console.log("Error in query: ")
+            console.log(err);
+        }
+    
+        // Log this to the console for debugging purposes.
+        console.log("Back from DB with result:");
+        console.log(result.rows);
+        if (result.rows[0] != undefined)
+            res.json(result.rows);
         else
             res.end("Fail");
     });

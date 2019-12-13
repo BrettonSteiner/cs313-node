@@ -66,16 +66,19 @@ function majorColor(results) {
 
 function iTeamNumber(results) {
     if (results != undefined) {
-        var data = {
-            "iteamNumber": results
-        }
 
-        $.ajax({
-            type: "GET",
-            url: '/getMentorInfo',
-            data: data,
-            success: mentorInfo
-        })
+        if (Number.isInteger(results)) {
+            var data = {
+                "iteamNumber": results
+            }
+
+            $.ajax({
+                type: "GET",
+                url: '/getMentorInfo',
+                data: data,
+                success: mentorInfo
+            })
+        }
 
         var html = '<h3>I-Team Number:</h3><h6>' + results + '</h6>';
         $("#iTeamResults").html(html);

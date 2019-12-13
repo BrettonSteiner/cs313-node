@@ -1,3 +1,7 @@
+var colleges = [];
+var complexes = [];
+var iteams = [];
+
 function userInfo() {
     $.ajax({
         type: "GET",
@@ -19,6 +23,9 @@ function clickMajors() {
         $("#complexesTab").removeClass("active");
         $("#apartmentsTab").removeClass("active");
 
+        if (colleges.length == 0)
+            getColleges();
+
         $("#recordsTable").DataTable().clear().destroy();
         $("#tableHead").html("<tr><th>Record Id</th><th>Major Name</th><th>College Id</th></tr>");
         getMajors();
@@ -33,7 +40,7 @@ function clickComplexes() {
 
         $("#recordsTable").DataTable().clear().destroy();
         $("#tableHead").html("<tr><th>Record Id</th><th>Complex Name</th></tr>");
-        getComplexes();
+        getComplexes(getComplexResults);
     }
 }
 
@@ -43,10 +50,23 @@ function clickApartments() {
         $("#complexesTab").removeClass("active");
         $("#apartmentsTab").addClass("active");
 
+        if (iteams.length == 0)
+            getITeams();
+        if (complexes.length == 0)
+            getComplexes(getComplexArrayResults);
+
         $("#recordsTable").DataTable().clear().destroy();
         $("#tableHead").html("<tr><th>Record Id</th><th>Apartment Number</th><th>Complex Id</th><th>I-Team Id</th></tr>");
         getApartments();
     }
+}
+
+function getColleges() {
+    $.ajax({
+        type: "GET",
+        url: '/getColleges',
+        success: getCollegeResults
+    })
 }
 
 function getMajors() {
@@ -60,14 +80,22 @@ function getMajors() {
     })
 }
 
-function getComplexes() {
+function getComplexes(callback) {
     $("#recordsTable").DataTable().clear().destroy();
 
     $.ajax({
         type: "GET",
         url: '/getComplexes',
         data: {},
-        success: getComplexResults
+        success: callback
+    })
+}
+
+function getITeams() {
+    $.ajax({
+        type: "GET",
+        url: '/getITeams',
+        success: getITeamResults
     })
 }
 
@@ -80,6 +108,13 @@ function getApartments() {
         data: {},
         success: getApartmentResults
     })
+}
+
+function getCollegeResults(results) {
+    if (results != "Fail")
+        $.each(results, function(index, result) {
+            colleges.push({ id: result.id, name: result.name, color: result.color});
+        });
 }
 
 function getMajorResults(results) {
@@ -98,6 +133,13 @@ function getMajorResults(results) {
     }
 }
 
+function getComplexArrayResults(results) {
+    if (results != "Fail")
+        $.each(results, function(index, result) {
+            complexes.push({ id: result.id, name: result.name});
+        });
+}
+
 function getComplexResults(results) {
     if (results == "Fail") {
         $("#modalTitle").text("Server Error:");
@@ -110,9 +152,19 @@ function getComplexResults(results) {
             html += '<tr onclick="selectComplexRecord(' + result.id + ')"><td>' + result.id + '</td><td>' + result.name + '</td></tr>';
         });
 
+        if (complexes.length == 0)
+            getComplexArrayResults(results);
+
         $("#searchResults").html(html);
         $("#recordsTable").DataTable();
     }
+}
+
+function getITeamResults(results) {
+    if (results != "Fail")
+        $.each(results, function(index, result) {
+            iteams.push({ id: result.id, number: result.number});
+        });
 }
 
 function getApartmentResults(results) {
@@ -171,7 +223,14 @@ function getMajorRecord(results) {
     else {
         console.log(results);
         var modalBody = '<form><div class="form-group"><label for="modalName">Major Name</label><input type="text" class="form-control" id="modalName" placeholder="' + results.name + '" value="' + results.name + '"></div>'
-            + '<div class="form-group"><label for="modalCollegeId">College Id</label><input type="text" class="form-control" id="modalCollegeId" placeholder="' + results.collegeid + '" value="' + results.collegeid + '"></div></form>';
+            + '<div class="form-group"><label for="modalCollegeId">College Id</label><select class="form-control" id="modalCollegeId">';
+        for (var i = 0; i < colleges.length; i++) {
+            modalBody += '<option value="' + colleges[i].id + '"';
+            if (colleges[i].id == results.collegeid)
+                modalBody += ' selected';
+            modalBody += '>' + colleges[i].id + ' - ' + colleges[i].name + '</option>';
+        }
+        modalBody += '</select></div></form>';
         var modalFooter = '<button class="btn btn-danger mr-auto" type="button" onClick="deleteMajor(' + results.id + ')" data-dismiss="modal">Delete</button>'
             + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>'
             + '<button class="btn btn-primary" type="button" onClick="updateMajor(' + results.id + ', ' + results.collegeid + ')" data-dismiss="modal">Save Changes</button>';
@@ -212,8 +271,21 @@ function getApartmentRecord(results) {
     else {
         console.log(results);
         var modalBody = '<form><div class="form-group"><label for="modalNumber">Apartment Number</label><input type="text" class="form-control" id="modalNumber" placeholder="' + results.number + '" value="' + results.number + '"></div>'
-            + '<div class="form-group"><label for="modalComplexId">Complex Id</label><input type="text" class="form-control" id="modalComplexId" placeholder="' + results.complexid + '" value="' + results.complexid + '"></div>'
-            + '<div class="form-group"><label for="modaliTeamId">I-Team Id</label><input type="text" class="form-control" id="modaliTeamId" placeholder="' + results.iteamid + '" value="' + results.iteamid + '"></div></form>';
+            + '<div class="form-group"><label for="modalComplexId">Complex Id</label><select class="form-control" id="modalComplexId">';
+        for (var i = 0; i < complexes.length; i++) {
+            modalBody += '<option value="' + complexes[i].id + '"';
+            if (complexes[i].id == results.complexid)
+                modalBody += ' selected';
+            modalBody += '>' + complexes[i].id + ' - ' + complexes[i].name + '</option>';
+        }
+        modalBody += '</select></div><div class="form-group"><label for="modaliTeamId">I-Team Id</label><select class="form-control" id="modaliTeamId">';
+        for (var i = 0; i < iteams.length; i++) {
+            modalBody += '<option value="' + iteams[i].id + '"';
+            if (iteams[i].id == results.iteamid)
+                modalBody += ' selected';
+            modalBody += '>' + iteams[i].id + ' - I-Team Number ' + iteams[i].number + '</option>';
+        }
+        modalBody += '</select></div></form>';
         var modalFooter = '<button class="btn btn-danger mr-auto" type="button" onClick="deleteApartment(' + results.id + ')" data-dismiss="modal">Delete</button>'
             + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>'
             + '<button class="btn btn-primary" type="button" onClick="updateApartment(' + results.id + ', ' + results.iteamid + ', ' + results.iteamid + ')" data-dismiss="modal">Save Changes</button>';
@@ -302,7 +374,8 @@ function majorUpdated(results) {
 
 function complexUpdated(results) {
     if (results == "Success") {
-        getComplexes();
+        complexes = [];
+        getComplexes(getComplexResults);
     }
     else {
         console.log("Error updating complex");
@@ -374,7 +447,10 @@ function createNewRecord() {
 
 function createMajorForm() {
     var modalBody = '<form><div class="form-group"><label for="modalName">Major Name</label><input type="text" class="form-control" id="modalName" placeholder="Major Name"></div>'
-        + '<div class="form-group"><label for="modalCollegeId">College Id</label><input type="text" class="form-control" id="modalCollegeId" placeholder="College Id"></div></form>';
+        + '<div class="form-group"><label for="modalCollegeId">College Id</label><select class="form-control" id="modalCollegeId">';
+    for (var i = 0; i < colleges.length; i++)
+        modalBody += '<option value="' + colleges[i].id + '">' + colleges[i].id + ' - ' + colleges[i].name + '</option>';
+    modalBody += '</select></div></form>';
     var modalFooter = '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>'
         + '<button class="btn btn-primary" type="button" onClick="createMajor()" data-dismiss="modal">Create</button>';
 
@@ -397,8 +473,13 @@ function createComplexForm() {
 
 function createApartmentForm() {
     var modalBody = '<form><div class="form-group"><label for="modalNumber">Apartment Number</label><input type="text" class="form-control" id="modalNumber" placeholder="Apartment Number"></div>'
-        + '<div class="form-group"><label for="modalComplexId">Complex Id</label><input type="text" class="form-control" id="modalComplexId" placeholder="Complex Id"></div>'
-        + '<div class="form-group"><label for="modaliTeamId">I-Team Id</label><input type="text" class="form-control" id="modaliTeamId" placeholder="I-Team Id"></div></form>';
+        + '<div class="form-group"><label for="modalComplexId">Complex Id</label><select class="form-control" id="modalComplexId">';
+        for (var i = 0; i < complexes.length; i++)
+            modalBody += '<option value="' + complexes[i].id + '">' + complexes[i].id + ' - ' + complexes[i].name + '</option>';
+        modalBody += '</select></div><div class="form-group"><label for="modaliTeamId">I-Team Id</label><select class="form-control" id="modaliTeamId">';
+        for (var i = 0; i < iteams.length; i++)
+            modalBody += '<option value="' + iteams[i].id + '">' + iteams[i].id + ' - I-Team Number ' + iteams[i].number + '</option>';
+        modalBody += '</select></div></form>';
     var modalFooter = '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>'
         + '<button class="btn btn-primary" type="button" onClick="createApartment()" data-dismiss="modal">Create</button>';
 

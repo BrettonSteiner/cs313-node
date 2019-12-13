@@ -56,6 +56,8 @@ app.set('port', process.env.PORT || 8080)
    .post('/updateApartment', verifyLogin, controller.updateApartment)
    .post('/deleteApartment', verifyLogin, controller.deleteApartment)
    .put('/createApartment', verifyLogin, controller.createApartment)
+   .get('/getColleges', verifyLogin, controller.getColleges)
+   .get('/getITeams', verifyLogin, controller.getITeams)
    .get('/isLoggedIn', controller.isLoggedIn)
    .listen(app.get('port'), function(){
        console.log('Listening on port: ' + app.get('port'));
