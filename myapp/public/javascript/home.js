@@ -1,3 +1,6 @@
+var collegeResult = false;
+var iTeamResult = false;
+
 function userInfo() {
     $.ajax({
         type: "GET",
@@ -20,11 +23,13 @@ function userInfoResults(result) {
 }
 
 function getInfo() {
+    collegeResult = false;
+    iTeamResult = false;
     var majorName = $("#majorName").val();
     var complex = $("#complex").val();
     var apartment = $("#apartment").val();
 
-    var initialModalHtml = '<div id="majorResults"></div><div id="iTeamResults"></div><div id="mentorResults"></div>'
+    var initialModalHtml = '<div id="row"><div id="majorResults"></div><div id="iTeamResults"></div></div><div id="mentorResults"></div>'
     $("#modalBody").html(initialModalHtml);
     $("#modalTitle").text("Get Connected Information Results");
 
@@ -57,17 +62,24 @@ function getInfo() {
 }
 
 function majorColor(results) {
-    if (results != undefined) {
-        var html = '<h3>Major Color:</h3><h6>' + results + '</h6>';
-        $("#majorResults").html(html);
+    if (results != undefined ) {
+        if (results != "Unknown major") {
+            var html = '<div class="infoResult"><h5>College</h5><div class="' + results.color + '"><p>' + results.color + '<br><br><span>' + results.name + '</span></p></div></div>';
+            $("#majorResults").html(html);
+            collegeResult = true;
+            makeRow();
+        }
+        else {
+            var html = '<div class="infoResult"><h6>' + results + '</h6>';
+            $("#majorResults").html(html);
+        }
         $("#myModal").modal('show');
     }
 }
 
 function iTeamNumber(results) {
     if (results != undefined) {
-
-        if (Number.isInteger(results)) {
+        if (!isNaN(results)) {
             var data = {
                 "iteamNumber": results
             }
@@ -78,21 +90,43 @@ function iTeamNumber(results) {
                 data: data,
                 success: mentorInfo
             })
-        }
 
-        var html = '<h3>I-Team Number:</h3><h6>' + results + '</h6>';
-        $("#iTeamResults").html(html);
+            var html = '<div class="infoResult"><h5>I-Team</h5><div class="';
+            if (results % 2 === 0)
+                html += 'Even';
+            else
+                html += 'Odd';
+            html += '"><span>' + results + '</span></div></div>';
+            $("#iTeamResults").html(html);
+            iTeamResult = true;
+            makeRow();
+        }
+        else {
+            var html = '<br><div class="infoResult"><h6>' + results + '</h6>';
+            $("#mentorResults").html(html);
+        }
         $("#myModal").modal('show');
     }
 }
 
 function mentorInfo(results) {
     if (results != undefined) {
-        var html = '<h3>Mentors:</h3>';
+        var html = '<br><div class="infoResult"><h5>Mentors</h5>';
         $.each(results, function(index, result) {
             html += '<h6>' + result.name + ': ' + result.phone + '</h6>';
         });
+        html += '</div>';
         $("#mentorResults").html(html);
+    }
+}
+
+function makeRow() {
+    if (collegeResult && iTeamResult) {
+        $("#row").addClass("form-row");
+        $("#majorResults").addClass("form-group col-md-6");
+        $("#iTeamResults").addClass("form-group col-md-6");
+        collegeResult = false;
+        iTeamResult = false;
     }
 }
 
@@ -153,7 +187,7 @@ function startApartmentAutocomplete(results) {
         for (var i = 0; i < results.length; i++) {
             apartmentNumbers.push(results[i].number);
         }
-        console.log(apartmentNumbers);
+
         $("#apartment").autocomplete({
             source: apartmentNumbers
         });

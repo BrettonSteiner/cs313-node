@@ -82,6 +82,72 @@ small {
     color: red;
 }
 
+.infoResult {
+    text-align: center;
+}
+
+.infoResult h5 {
+    text-decoration-line: underline;
+}
+
+.infoResult div {
+    width: 150px;
+    height: 150px;
+    border: black solid 1px;
+    margin: auto;
+}
+
+.infoResult div p {
+    padding-top: 10px;
+    font-size: large;
+}
+
+.infoResult div p span {
+    line-height: normal;
+    font-size: small;
+}
+
+.infoResult div span {
+    line-height: 150px;
+    font-size: 50px;
+}
+
+.Grey {
+    background-color: lightgray;
+}
+
+.Orange {
+    background-color: orange;
+}
+
+.Yellow {
+    background-color: yellow;
+}
+
+.Blue {
+    background-color: deepskyblue;
+}
+
+.Purple {
+    background-color: mediumpurple;
+}
+
+.Red {
+    background-color: lightcoral;
+}
+
+.Green {
+    background-color: limegreen;
+}
+
+.Even {
+    background-color: greenyellow;
+}
+
+.Odd {
+    background-color: gold;
+}
+
 table th {
     background-color: #0076B6;
     color: white;

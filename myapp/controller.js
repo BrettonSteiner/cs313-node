@@ -150,7 +150,7 @@ function changeUsername(req, res) {
 }
 
 function getMajorColor(req, res) {
-    var sql = 'SELECT color FROM Colleges JOIN Majors ON Majors.collegeId = Colleges.id WHERE Majors.name = $1';
+    var sql = 'SELECT Colleges.name, Colleges.color FROM Colleges JOIN Majors ON Majors.collegeId = Colleges.id WHERE Majors.name = $1';
     var values = [req.query.majorName];
     
     pool.query(sql, values, function(err, result) {
@@ -164,7 +164,7 @@ function getMajorColor(req, res) {
         console.log("Back from DB with result:");
         console.log(result.rows);
         if (result.rows[0] != undefined)
-            res.end(result.rows[0].color);
+            res.json(result.rows[0]);
         else
             res.end("Unknown major");
     });
@@ -183,6 +183,7 @@ function getITeamNumber(req, res) {
     
         // Log this to the console for debugging purposes.
         console.log("Back from DB with result:");
+        console.log(result.rows);
         if (result.rows[0] != undefined)
             res.end(result.rows[0].number.toString());
         else
@@ -203,6 +204,7 @@ function getMentorInfo(req, res) {
     
         // Log this to the console for debugging purposes.
         console.log("Back from DB with result:")
+        console.log(result.rows);
         if (result.rows[0] != undefined)
             res.json(result.rows);
         else
