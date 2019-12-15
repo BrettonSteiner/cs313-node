@@ -474,12 +474,12 @@ function createComplexForm() {
 function createApartmentForm() {
     var modalBody = '<form><div class="form-group"><label for="modalNumber">Apartment Number</label><input type="text" class="form-control" id="modalNumber" placeholder="Apartment Number"></div>'
         + '<div class="form-group"><label for="modalComplexId">Complex Id</label><select class="form-control" id="modalComplexId">';
-        for (var i = 0; i < complexes.length; i++)
-            modalBody += '<option value="' + complexes[i].id + '">' + complexes[i].id + ' - ' + complexes[i].name + '</option>';
-        modalBody += '</select></div><div class="form-group"><label for="modaliTeamId">I-Team Id</label><select class="form-control" id="modaliTeamId">';
-        for (var i = 0; i < iteams.length; i++)
-            modalBody += '<option value="' + iteams[i].id + '">' + iteams[i].id + ' - I-Team Number ' + iteams[i].number + '</option>';
-        modalBody += '</select></div></form>';
+    for (var i = 0; i < complexes.length; i++)
+        modalBody += '<option value="' + complexes[i].id + '">' + complexes[i].id + ' - ' + complexes[i].name + '</option>';
+    modalBody += '</select></div><div class="form-group"><label for="modaliTeamId">I-Team Id</label><select class="form-control" id="modaliTeamId">';
+    for (var i = 0; i < iteams.length; i++)
+        modalBody += '<option value="' + iteams[i].id + '">' + iteams[i].id + ' - I-Team Number ' + iteams[i].number + '</option>';
+    modalBody += '</select></div></form>';
     var modalFooter = '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>'
         + '<button class="btn btn-primary" type="button" onClick="createApartment()" data-dismiss="modal">Create</button>';
 

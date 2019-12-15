@@ -95,3 +95,67 @@ function mentorInfo(results) {
         $("#mentorResults").html(html);
     }
 }
+
+function initializeAutocomplete() {
+    $.ajax({
+        type: "GET",
+        url: '/getMajorNames',
+        success: startMajorAutocomplete
+    })
+
+    $.ajax({
+        type: "GET",
+        url: '/getComplexNames',
+        success: startComplexAutocomplete
+    })
+}
+
+function refreshApartmentAutocomplete() {
+    var complexName = $("#complex").val();
+
+    $.ajax({
+        type: "GET",
+        url: '/getApartmentNumbers',
+        data: { complex: complexName },
+        success: startApartmentAutocomplete
+    })
+}
+
+function startMajorAutocomplete(results) {
+    if (results != "Fail") {
+        var majorNames = [];
+        for (var i = 0; i < results.length; i++) {
+            majorNames.push(results[i].name);
+        }
+
+        $("#majorName").autocomplete({
+            source: majorNames
+        });
+    }
+}
+
+function startComplexAutocomplete(results) {
+    if (results != "Fail") {
+        var complexNames = [];
+        for (var i = 0; i < results.length; i++) {
+            complexNames.push(results[i].name);
+        }
+
+        $("#complex").autocomplete({
+            source: complexNames
+        });
+    }
+}
+
+function startApartmentAutocomplete(results) {
+    if (results != "Fail") {
+        var apartmentNumbers = [];
+        for (var i = 0; i < results.length; i++) {
+            apartmentNumbers.push(results[i].number);
+        }
+        console.log(apartmentNumbers);
+        $("#apartment").autocomplete({
+            source: apartmentNumbers
+        });
+    }
+}

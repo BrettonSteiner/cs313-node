@@ -1,9 +1,9 @@
 module.exports = {createAccount: createAccount, login: login, logout: logout,
     changePassword: changePassword, availableUsername: availableUsername, changeUsername: changeUsername,
     getMajorColor: getMajorColor, getITeamNumber: getITeamNumber, getMentorInfo: getMentorInfo,
-    getMajors: getMajors, getMajor: getMajor, updateMajor: updateMajor, deleteMajor: deleteMajor, createMajor: createMajor,
-    getComplexes: getComplexes, getComplex: getComplex, updateComplex: updateComplex, deleteComplex: deleteComplex, createComplex: createComplex,
-    getApartments: getApartments, getApartment: getApartment, updateApartment: updateApartment, deleteApartment: deleteApartment, createApartment: createApartment,
+    getMajors: getMajors, getMajorNames: getMajorNames, getMajor: getMajor, updateMajor: updateMajor, deleteMajor: deleteMajor, createMajor: createMajor,
+    getComplexes: getComplexes, getComplexNames: getComplexNames, getComplex: getComplex, updateComplex: updateComplex, deleteComplex: deleteComplex, createComplex: createComplex,
+    getApartments: getApartments, getApartmentNumbers: getApartmentNumbers, getApartment: getApartment, updateApartment: updateApartment, deleteApartment: deleteApartment, createApartment: createApartment,
     getColleges: getColleges, getITeams: getITeams, isLoggedIn: isLoggedIn};
 
 require('dotenv').config({path: __dirname + '/../variables.env'});
@@ -230,6 +230,26 @@ function getMajors(req, res) {
     });
 }
 
+function getMajorNames(req, res) {
+    var sql = 'SELECT name FROM Majors';
+    
+    pool.query(sql, function(err, result) {
+        // If an error occurred...
+        if (err) {
+            console.log("Error in query: ")
+            console.log(err);
+        }
+    
+        // Log this to the console for debugging purposes.
+        console.log("Back from DB with result:");
+        console.log(result.rows);
+        if (result.rows[0] != undefined)
+            res.json(result.rows);
+        else
+            res.end("Fail");
+    });
+}
+
 function getMajor(req, res) {
     var sql = 'SELECT id, name, collegeid FROM Majors WHERE id = $1';
     var values = [ req.query.id ];
@@ -319,6 +339,26 @@ function createMajor(req, res) {
 function getComplexes(req, res) {
     var sql = 'SELECT id, name FROM Complexes ORDER BY id';
 
+    pool.query(sql, function(err, result) {
+        // If an error occurred...
+        if (err) {
+            console.log("Error in query: ")
+            console.log(err);
+        }
+    
+        // Log this to the console for debugging purposes.
+        console.log("Back from DB with result:");
+        console.log(result.rows);
+        if (result.rows[0] != undefined)
+            res.json(result.rows);
+        else
+            res.end("Fail");
+    });
+}
+
+function getComplexNames(req, res) {
+    var sql = 'SELECT name FROM Complexes';
+    
     pool.query(sql, function(err, result) {
         // If an error occurred...
         if (err) {
@@ -426,6 +466,32 @@ function getApartments(req, res) {
     var sql = 'SELECT id, number, complexid, iteamid FROM Apartments ORDER BY id';
     
     pool.query(sql, function(err, result) {
+        // If an error occurred...
+        if (err) {
+            console.log("Error in query: ")
+            console.log(err);
+        }
+    
+        // Log this to the console for debugging purposes.
+        console.log("Back from DB with result:");
+        console.log(result.rows);
+        if (result.rows[0] != undefined)
+            res.json(result.rows);
+        else
+            res.end("Fail");
+    });
+}
+
+function getApartmentNumbers(req, res) {
+    const complexName = req.query.complex;
+    var sql = 'SELECT number FROM Apartments';
+    var values = [];
+    if (complexName != undefined && complexName != "") {
+        sql += " JOIN Complexes ON Complexes.id = Apartments.complexid WHERE Complexes.name = $1";
+        values.push(complexName);
+    }
+    
+    pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
             console.log("Error in query: ")

@@ -6,13 +6,15 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" type="text/css" href="/css/byuistyle.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script type="text/javascript" src="/javascript/home.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <title>Binder - Get Connected</title>
 </head>
-<body onload="userInfo()">
+<body onload="userInfo(); initializeAutocomplete();">
     <div>
         <% include partials/header.ejs %>
         <% include partials/navbar.ejs %>
@@ -28,7 +30,7 @@
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="complex">Apartment Complex</label>
-                    <input type="input" class="form-control" id="complex" placeholder="Apartment Complex">
+                    <input type="input" class="form-control" id="complex" onBlur="refreshApartmentAutocomplete()" placeholder="Apartment Complex">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="apartment">Apartment Number</label>
