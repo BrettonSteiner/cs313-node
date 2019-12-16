@@ -20,14 +20,17 @@
     </div>
     <div class="container">
         <h1>Profile</h1>
+        <h3 id="currentUsername">username</h3><hr>
         <div id="usernameChange">
-            <h3>Username: <span id="currentUsername">username</span></h3>
-            <button type="button" onclick="changeUsernameForm()">Change Username</button>
+            <button class="btn btn-secondary" type="button" onclick="changeUsernameForm()">Change Username</button>
         </div>
-        
-        <br>
+        <br><hr>
         <div id="pwdChange">
-            <button type="button" onclick="changePasswordForm()">Change Password</button>
+            <button class="btn btn-secondary" type="button" onclick="changePasswordForm()">Change Password</button>
+        </div>
+        <br><hr>
+        <div id="dltAccount">
+            <button class="btn btn-danger" type="button" onclick="deleteAccountForm()">Delete Account</button>
         </div>
     </div>
     <% include partials/footer.ejs %>

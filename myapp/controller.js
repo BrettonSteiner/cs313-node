@@ -1,5 +1,5 @@
 module.exports = {createAccount: createAccount, login: login, logout: logout,
-    changePassword: changePassword, availableUsername: availableUsername, changeUsername: changeUsername,
+    changePassword: changePassword, availableUsername: availableUsername, changeUsername: changeUsername, verifyPassword: verifyPassword, deleteAccount: deleteAccount,
     getMajorColor: getMajorColor, getITeamNumber: getITeamNumber, getMentorInfo: getMentorInfo,
     getMajors: getMajors, getMajorNames: getMajorNames, getMajor: getMajor, updateMajor: updateMajor, deleteMajor: deleteMajor, createMajor: createMajor,
     getComplexes: getComplexes, getComplexNames: getComplexNames, getComplex: getComplex, updateComplex: updateComplex, deleteComplex: deleteComplex, createComplex: createComplex,
@@ -7,7 +7,6 @@ module.exports = {createAccount: createAccount, login: login, logout: logout,
     getColleges: getColleges, getITeams: getITeams, isLoggedIn: isLoggedIn};
 
 require('dotenv').config({path: __dirname + '/../variables.env'});
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0; //This will need to be deactivated for Heroku at some point... Meant to only be used locally
 
 const { Pool } = require('pg');
 const connectionString = process.env.DATABASE_URL;
@@ -23,13 +22,9 @@ function createAccount(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: " + err);
             res.end("Error: " + err);
         }
     
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result);
         res.end("Success");
     });
 }
@@ -42,21 +37,16 @@ function login(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: " + err);
             res.end("Error: " + err);
         }
     
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows[0]);
         if (result.rows[0]) {
             bcrypt.compare(req.body.password, result.rows[0].password, (err, result)=>{
                 if (err) {
-                    console.log("An error occured... \n" + err);
+                    res.json({ success: false });
                 }
                 
                 if (result == true) {
-                    console.log("Login successful!");
                     success = true;
                     req.session.username = req.body.username;
                 }
@@ -71,7 +61,6 @@ function login(req, res) {
 
 function logout(req, res) {
     if (req.session.username != null) {
-        console.log(req.session.username + " logged out.");
         req.session.destroy();
         res.render("sign-in");
     }
@@ -89,13 +78,9 @@ function changePassword(req, res) {
         pool.query(sql, values, function(err, result) {
             // If an error occurred...
             if (err) {
-                console.log("Error in query: " + err);
                 res.end("Error: " + err);
             }
-        
-            // Log this to the console for debugging purposes.
-            console.log("Back from DB with result:");
-            console.log(result);
+
             res.json({success: true});
         });
     }
@@ -114,13 +99,9 @@ function availableUsername(req, res) {
         pool.query(sql, values, function(err, result) {
             // If an error occurred...
             if (err) {
-                console.log("Error in query: " + err);
                 res.end("Error: " + err);
             }
-        
-            // Log this to the console for debugging purposes.
-            console.log("Back from DB with result:");
-            console.log(result.rows);
+
             if (result.rows[0] != undefined)
                 res.end("Username is not available");
             else
@@ -137,15 +118,55 @@ function changeUsername(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: " + err);
             res.end("Error: " + err);
         }
     
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result);
         req.session.username = username;
         res.json({success: true});
+    });
+}
+
+function verifyPassword(req, res) {
+    var sql = 'SELECT id, password FROM Users WHERE username = $1';
+    var values = [ req.session.username ];
+
+    pool.query(sql, values, function(err, results) {
+        // If an error occurred...
+        if (err) {
+            res.end("Error: " + err);
+        }
+
+        if (results.rows[0]) {
+            bcrypt.compare(req.body.password, results.rows[0].password, (err, result)=>{
+                if (err) {
+                    res.json({ success: false });
+                }
+                
+                if (result == true) {
+                    res.json({ success: true, id: results.rows[0].id });    
+                }
+                else {
+                    res.json({ success: false });
+                }
+            });
+        }
+        else {
+            res.json({ success: false });
+        }
+    });
+}
+
+function deleteAccount(req, res) {
+    var sql = 'DELETE FROM Users WHERE id = $1';
+    var values = [req.body.id];
+
+    pool.query(sql, values, function(err, result) {
+        // If an error occurred...
+        if (err) {
+            res.json({ success: false });
+        }
+
+        res.json({ success: true });
     });
 }
 
@@ -156,13 +177,9 @@ function getMajorColor(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Unknown major");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows[0] != undefined)
             res.json(result.rows[0]);
         else
@@ -177,13 +194,9 @@ function getITeamNumber(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Unknown complex or apartment");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows[0] != undefined)
             res.end(result.rows[0].number.toString());
         else
@@ -198,13 +211,9 @@ function getMentorInfo(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Unknown I-Team number");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:")
-        console.log(result.rows);
+
         if (result.rows[0] != undefined)
             res.json(result.rows);
         else
@@ -218,13 +227,9 @@ function getMajors(req, res) {
     pool.query(sql, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows[0] != undefined)
             res.json(result.rows);
         else
@@ -238,13 +243,9 @@ function getMajorNames(req, res) {
     pool.query(sql, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
     
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
         if (result.rows[0] != undefined)
             res.json(result.rows);
         else
@@ -259,13 +260,9 @@ function getMajor(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows[0] != undefined)
             res.json(result.rows[0]);
         else
@@ -281,13 +278,9 @@ function updateMajor(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows != undefined)
             res.json("Success");
         else
@@ -302,13 +295,9 @@ function deleteMajor(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows != undefined)
             res.json("Success");
         else
@@ -324,13 +313,9 @@ function createMajor(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
     
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
         if (result.rows != undefined)
             res.json("Success");
         else
@@ -344,13 +329,9 @@ function getComplexes(req, res) {
     pool.query(sql, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows[0] != undefined)
             res.json(result.rows);
         else
@@ -364,13 +345,9 @@ function getComplexNames(req, res) {
     pool.query(sql, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows[0] != undefined)
             res.json(result.rows);
         else
@@ -385,13 +362,9 @@ function getComplex(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows[0] != undefined)
             res.json(result.rows[0]);
         else
@@ -407,13 +380,9 @@ function updateComplex(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows != undefined)
             res.json("Success");
         else
@@ -428,13 +397,9 @@ function deleteComplex(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows != undefined)
             res.json("Success");
         else
@@ -450,13 +415,9 @@ function createComplex(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows != undefined)
             res.json("Success");
         else
@@ -470,13 +431,9 @@ function getApartments(req, res) {
     pool.query(sql, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
     
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
         if (result.rows[0] != undefined)
             res.json(result.rows);
         else
@@ -496,13 +453,9 @@ function getApartmentNumbers(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows[0] != undefined)
             res.json(result.rows);
         else
@@ -517,13 +470,9 @@ function getApartment(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows[0] != undefined)
             res.json(result.rows[0]);
         else
@@ -539,13 +488,9 @@ function updateApartment(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows != undefined)
             res.json("Success");
         else
@@ -560,13 +505,9 @@ function deleteApartment(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows != undefined)
             res.json("Success");
         else
@@ -582,13 +523,9 @@ function createApartment(req, res) {
     pool.query(sql, values, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows != undefined)
             res.json("Success");
         else
@@ -602,13 +539,9 @@ function getColleges(req, res) {
     pool.query(sql, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows[0] != undefined)
             res.json(result.rows);
         else
@@ -622,13 +555,9 @@ function getITeams(req, res) {
     pool.query(sql, function(err, result) {
         // If an error occurred...
         if (err) {
-            console.log("Error in query: ")
-            console.log(err);
+            res.end("Fail");
         }
-    
-        // Log this to the console for debugging purposes.
-        console.log("Back from DB with result:");
-        console.log(result.rows);
+
         if (result.rows[0] != undefined)
             res.json(result.rows);
         else

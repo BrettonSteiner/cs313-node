@@ -185,7 +185,6 @@ function getApartmentResults(results) {
 }
 
 function selectMajorRecord(id) {
-    console.log("Clicked Major record " + id);
     $.ajax({
         type: "GET",
         url: '/getMajor',
@@ -195,7 +194,6 @@ function selectMajorRecord(id) {
 }
 
 function selectComplexRecord(id) {
-    console.log("Clicked Complex record " + id);
     $.ajax({
         type: "GET",
         url: '/getComplex',
@@ -205,7 +203,6 @@ function selectComplexRecord(id) {
 }
 
 function selectApartmentRecord(id) {
-    console.log("Clicked Apartment record " + id);
     $.ajax({
         type: "GET",
         url: '/getApartment',
@@ -221,7 +218,6 @@ function getMajorRecord(results) {
         $("#myModal").modal({backdrop: true, show: true});
     }
     else {
-        console.log(results);
         var modalBody = '<form><div class="form-group"><label for="modalName">Major Name</label><input type="text" class="form-control" id="modalName" placeholder="' + results.name + '" value="' + results.name + '"></div>'
             + '<div class="form-group"><label for="modalCollegeId">College Id</label><select class="form-control" id="modalCollegeId">';
         for (var i = 0; i < colleges.length; i++) {
@@ -249,7 +245,6 @@ function getComplexRecord(results) {
         $("#myModal").modal({backdrop: true, show: true});
     }
     else {
-        console.log(results);
         var modalBody = '<form><div class="form-group"><label for="modalName">Complex Name</label><input type="text" class="form-control" id="modalName" id="modalName" placeholder="' + results.name + '" value="' + results.name + '"></div></form>';
         var modalFooter = '<button class="btn btn-danger mr-auto" type="button" onClick="deleteComplex(' + results.id + ')" data-dismiss="modal">Delete</button>'
             + '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>'
@@ -269,7 +264,6 @@ function getApartmentRecord(results) {
         $("#myModal").modal({backdrop: true, show: true});
     }
     else {
-        console.log(results);
         var modalBody = '<form><div class="form-group"><label for="modalNumber">Apartment Number</label><input type="text" class="form-control" id="modalNumber" placeholder="' + results.number + '" value="' + results.number + '"></div>'
             + '<div class="form-group"><label for="modalComplexId">Complex Id</label><select class="form-control" id="modalComplexId">';
         for (var i = 0; i < complexes.length; i++) {
@@ -365,7 +359,6 @@ function majorUpdated(results) {
         getMajors();
     }
     else {
-        console.log("Error updating major");
         $("#modalTitle").text("Server Error:");
         $("#modalBody").html("<p>" + results + "</p>");
         $("#myModal").modal({backdrop: true, show: true});
@@ -378,7 +371,6 @@ function complexUpdated(results) {
         getComplexes(getComplexResults);
     }
     else {
-        console.log("Error updating complex");
         $("#modalTitle").text("Server Error:");
         $("#modalBody").html("<p>" + results + "</p>");
         $("#myModal").modal({backdrop: true, show: true});
@@ -390,7 +382,6 @@ function apartmentUpdated(results) {
         getApartments();
     }
     else {
-        console.log("Error updating apartment");
         $("#modalTitle").text("Server Error:");
         $("#modalBody").html("<p>" + results + "</p>");
         $("#myModal").modal({backdrop: true, show: true});

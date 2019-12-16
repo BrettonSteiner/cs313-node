@@ -22,7 +22,6 @@ function signIn() {
         "username": username,
         "password": password
     }
-    console.log(data);
 
     $.ajax({
         type: "POST",
@@ -40,7 +39,6 @@ function logIn(result) {
 }
 
 function signUp() {
-    console.log("Entered signUp()");
     var username = $("#username").val();
     var data = {
         "username": username
@@ -56,7 +54,6 @@ function signUp() {
 
 function signUpUsernameResult(results) {
     if (results == "Success") {
-        console.log("Username is available");
         $("#usernameError").hide();
 
         var username = $("#username").val();
@@ -81,7 +78,6 @@ function signUpUsernameResult(results) {
         }
     }
     else {
-        console.log("Username is not available");
         $("#usernameError").show();
         doPasswordsMatch(password, cpassword);
     } 
@@ -92,7 +88,7 @@ function accountCreated(result) {
         window.location.href = "/sign-in";
     else {
         $("#modalTitle").text("Server Error:");
-        $("#modalBody").html("<p>" + result + "</p>");
+        $("#modalBody").html("<p>Account failed to be created.</p>");
         $("#myModal").modal('show');
     }
 }
@@ -140,20 +136,19 @@ function changeUsernameResult(results) {
 
     }
     else {
-        console.log("Username is not available");
         $("#usernameError").show();
     }
 }
 
 function changedUsername(result) {
     if (result.success) {
-        var html = '<h3>Username: <span id="currentUsername">username</span></h3>Username changed.';
+        var html = 'Username changed.<br><button class="btn btn-secondary" type="button" onclick="changeUsernameForm()">Change Username</button>';
         $("#usernameChange").html(html);
         userInfo();
     }
     else {
         $("#modalTitle").text("Server Error:");
-        $("#modalBody").html("<p>" + result + "</p>");
+        $("#modalBody").html("<p>Username failed to be changed.</p>");
         $("#myModal").modal('show');
     }
 }
@@ -189,10 +184,10 @@ function changePassword() {
 
 function changedPassword(result) {
     if (result.success)
-        $("#pwdChange").text("Password changed.")
+        $("#pwdChange").html('Password changed.<br><button class="btn btn-secondary" type="button" onclick="changePasswordForm()">Change Password</button>')
     else {
         $("#modalTitle").text("Server Error:");
-        $("#modalBody").html("<p>" + result + "</p>");
+        $("#modalBody").html("<p>Password failed to be changed.</p>");
         $("#myModal").modal('show');
     }
 }
@@ -207,4 +202,66 @@ function doPasswordsMatch(pwd, cpwd) {
         $("#passwordError").hide();
 
     return validInput;
+}
+
+function deleteAccountForm() {
+    var dltAccount = $("#dltAccount");
+    var dltAccountForm = '<form><div class="form-group"><label for="pwd">Confirm with Password:</label><input type="password" class="form-control" id="pwd" name="pwd">' +
+        '<small id="deleteError" class="error">Incorrect password.</small></div>' +
+        '<button type="button" onClick="deleteAccount()" class="btn btn-danger">Delete Account</button></form>';
+    
+        dltAccount.html(dltAccountForm);
+}
+
+function deleteAccount() {
+    var pwd = $("#pwd").val();
+
+    if (pwd != undefined && pwd != "") {
+        $("#deleteError").hide();
+        var data = {
+            "password": pwd
+        }
+
+        $.ajax({
+            type: "POST",
+            url: '/verifyPassword',
+            data: data,
+            success: passwordVerified
+        })
+    }
+    else {
+        $("#deleteError").show();
+    }
+}
+
+function passwordVerified(results) {
+    if (results != undefined && results.success == true && results.id != undefined) {
+        $("#deleteError").hide();
+
+        var data = {
+            "id": results.id
+        }
+
+        $.ajax({
+            type: "POST",
+            url: '/deleteAccount',
+            data: data,
+            success: accountDeleted
+        })
+    }
+    else {
+        $("#deleteError").show();
+    }
+}
+
+function accountDeleted(results) {
+    console.log(results);
+    if (results != undefined && results.success == true) {
+        window.location.href = "/logout";
+    }
+    else {
+        $("#modalTitle").text("Server Error:");
+        $("#modalBody").html("<p>Account failed to be deleted.</p>");
+        $("#myModal").modal('show');
+    }
 }
